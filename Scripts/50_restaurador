@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+
+HOME_BACKUP_UUID=`cat /etc/fstab | grep /home/restaurador | awk '{print $1}' | cut -f2 -d "=" | grep -v "#"`
+
+	echo "Add restaurador entry"  >&2
+
+	cat << EOF
+menuentry "Restaurar Sistema Operacional de Fábrica" {
+set root=(hd0,8)
+linux	/boot/vmlinuz restaurar-local quiet
+initrd 	/boot/initrd.gz
+}
+EOF
+
+# fi

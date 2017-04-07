@@ -1,0 +1,13 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Notificador de gravação
+Comment=Lembrar de gravar discos de recuperação
+Icon=/usr/share/restaurador/1.0/n3-logo-icon.png
+Exec=/opt/restaurador
+Terminal=false
+Type=Application
+Categories=
+NotShowIn=KDE;
+NoDisplay=true
+X-GNOME-Autostart-Delay=15
+

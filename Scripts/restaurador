@@ -1,0 +1,8 @@
+#! /bin/sh
+
+# Se o arquivo não foi criado, ou seja, o botão "remover alerta" não foi pressionado. Execute o Restaurador.
+if [ -e /home/kronnix/.notificador/restaurador ]; then
+	echo "NOPS" > /dev/null
+else
+	Restaurador
+fi

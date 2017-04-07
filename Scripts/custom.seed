@@ -1,0 +1,39 @@
+tasksel	tasksel/first	multiselect ubuntu-desktop
+
+d-i debian-installer/locale string pt_BR
+
+#configuracao teclado
+d-i console-setup/ask_detect boolean false
+keyboard-configuration	keyboard-configuration/modelcode	string	abnt2
+keyboard-configuration	keyboard-configuration/layout	select	Brazil
+keyboard-configuration	keyboard-configuration/variant	select	Brazil
+keyboard-configuration	keyboard-configuration/layoutcode	string	br
+
+d-i time/zone string America/Sao_Paulo
+d-i partman-auto/disk string /dev/sda
+d-i partman-auto/method string regular
+
+#Particionamento fornecendo espaço para Windows
+
+d-i partman-auto/expert_recipe string kronnix :: 20000 20100 20200 ntfs $primary{ } method{ format } format{ } use_filesystem{ } filesystem{ } mountpoint{ /home/backup } . 500 512 520 ext4 $primary{ } $bootable{ } method{ format } format{ } use_filesystem{ } filesystem{ ext4 } mountpoint{ /boot } . 14000 15000 16000 ext4 method{ format } format{ } use_filesystem{ } filesystem{ ext4 } mountpoint{ / } . 15000 16000 1000000000 ext4 method{ format } format{ } use_filesystem{ } filesystem{ ext4 } mountpoint{ /home } . 150% 200% 250%  linux-swap method{ swap } format{ } . 9900 10000 10100 ext4 method{ format } format{ } use_filesystem{ } filesystem{ ext4 } mountpoint{ /home/restaurador } .
+
+d-i partman/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+
+d-i passwd/make-user boolean false
+d-i passwd/user-fullname string   kronnix
+d-i passwd/username string  kronnix
+d-i passwd/user-password password kronnix 
+d-i passwd/user-password-again password kronnix 
+d-i passwd/auto-login boolean true
+
+d-i grub-installer/only_debian boolean true
+ubiquity ubiquity/success_command string /opt/criar_restaurador
+d-i finish-install/reboot_in_progress note
+
+d-i cdrom-detect/eject boolean true
+ubiquity ubiquity/summary note
+
+
+

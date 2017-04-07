@@ -1,0 +1,54 @@
+#!/bin/bash -e
+
+if [ $UID != 0 ] ; then
+    echo "Você não é root!"
+    exit 1
+fi
+
+CHROOT_COMMAND="prepara_tudo.sh"
+CHROOTDIR=squashfs-root
+CDROMDIR=cdrom
+
+cat > prepara_tudo.sh << EOF
+#! /bin/bash
+
+apt-get clean
+rm /tmp/* -rf
+history -c
+
+exit 0
+EOF
+
+if [ ! -z $CHROOT_COMMAND ]; then
+	echo "Entrando no chroot..."
+
+	mount -t devpts 	none 	$CHROOTDIR/dev/pts/
+	mount -t proc 		none 	$CHROOTDIR/proc/
+	mount -t sysfs 		none 	$CHROOTDIR/sys/
+
+	mv $CHROOT_COMMAND $CHROOTDIR/
+	chmod a+x $CHROOTDIR/$CHROOT_COMMAND
+	chroot $CHROOTDIR/ /$CHROOT_COMMAND
+	rm $CHROOTDIR/$CHROOT_COMMAND
+
+	umount $CHROOTDIR/dev/pts/
+	umount $CHROOTDIR/proc/
+	umount $CHROOTDIR/sys/
+	echo "Saindo do chroot..."
+fi
+
+#Apagando resolv.conf se ele existir. 
+if [ -f $CHROOTDIR/etc/resolv.conf ]; then
+	rm -f $CHROOTDIR/etc/resolv.conf	
+fi
+
+#Criando cdrom
+rm -f $CDROMDIR/casper/filesystem.squashfs
+mksquashfs $CHROOTDIR $CDROMDIR/casper/filesystem.squashfs
+cd $CDROMDIR
+rm md5sum.txt
+find -type f -print0 | xargs -0 md5sum | grep -v isolinux/boot.cat | tee md5sum.txt
+mkisofs -D -r -V "KRONNIX2" -cache-inodes -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o ../kronnix2-dev.iso .
+cd -
+
+exit 0
